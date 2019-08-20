@@ -82,6 +82,7 @@ class LoginPage(BasePage):
         tree = et.ElementTree(et.fromstring(self.request_builder()))
         language_dependency = tree.findall('//poll[@name="language_dependence"]/results/result')
         for element in range(len(language_dependency)):
+            print(language_dependency[element].get('value'))
             print(language_dependency[element].get('numvotes'))
 
 
