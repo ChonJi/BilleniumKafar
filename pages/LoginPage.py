@@ -10,6 +10,7 @@ from pages.BasePage import BasePage
 
 class LoginPage(BasePage):
 
+    #WebElements
     sign_in_button = "//button[@class='btn btn-sm']"
     username_text_field = "inputUsername"
     password_text_field = "inputPassword"
@@ -20,20 +21,7 @@ class LoginPage(BasePage):
     rows = "collection_objectname"
     column = "collection_title"
     game_titles = "//tbody/tr/td[contains(@id,'CEcell_objectname')]/div/a"
-
-
-
-    """
-    driver.get(base_url)
-    driver.find_element_by_xpath(base_sign_in).click()
-    driver.find_element_by_id(text_field_username).send_keys(Credentials.username)
-    driver.find_element_by_id(text_field_password).send_keys(Credentials.password)
-    driver.find_element_by_xpath(popup_sign_in).click()
-    driver.implicitly_wait(5)
-    driver.find_element_by_xpath(dropdown_list).click()
-    driver.find_element_by_xpath(collection)
-
-    """
+    language_dependence_info = "//span[@item-poll-button='languagedependence']/span"
 
     def check_if_home_page_is_open(self):
         assert self.driver.current_url == "https://boardgamegeek.com/"
@@ -78,14 +66,25 @@ class LoginPage(BasePage):
         response = requests.request("GET", url, headers=headers)
         return str(response.text)
 
-    def assert_language_dependencies_text(self):
-        tree = et.ElementTree(et.fromstring(self.request_builder()))
+    def get_request_tree(self):
+        return et.ElementTree(et.fromstring(self.request_builder()))
+
+    def get_max_votes(self):
+        tree = self.get_request_tree()
         language_dependency = tree.findall('//poll[@name="language_dependence"]/results/result')
+        max_votes = 0
         for element in range(len(language_dependency)):
-            print(language_dependency[element].get('value'))
-            print(language_dependency[element].get('numvotes'))
+            current_votes = int(language_dependency[element].get('numvotes'))
+            if current_votes > max_votes:
+                max_votes = current_votes
+        return max_votes
 
-
-
-
-
+    def assert_language_dependence_info(self):
+        tree = self.get_request_tree()
+        if self.get_max_votes() == 0:
+            print(self.driver.find_element_by_xpath(self.language_dependence_info).text)
+            assert self.driver.find_element_by_xpath(self.language_dependence_info).text == "(no votes)"
+        else:
+            assert self.driver.find_element_by_xpath(self.language_dependence_info).text == tree.findall(
+                '//poll[@name="language_dependence"]/results/result[@numvotes="' + str(self.get_max_votes()) + '"]')[0].get(
+                'value') == self.driver.find_element_by_xpath(self.language_dependence_info).text
