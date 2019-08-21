@@ -4,11 +4,14 @@ import time
 
 import requests
 import xml.etree.ElementTree as et
+from selenium.webdriver.support.ui import WebDriverWait as wait
+from selenium.webdriver.support import expected_conditions as Expected_Conditions
+from selenium.webdriver.common.by import By
 
 from pages.BasePage import BasePage
 
 
-class LoginPage(BasePage):
+class TestLibrary(BasePage):
 
     #WebElements
     sign_in_button = "//button[@class='btn btn-sm']"
@@ -40,8 +43,8 @@ class LoginPage(BasePage):
         self.driver.find_element_by_xpath(self.collection).click()
 
     def click_on_random_game_name(self):
-        time.sleep(2)
-        game_elements = self.driver.find_elements_by_xpath(self.game_titles)
+
+        game_elements = wait(self.driver, 5).until(Expected_Conditions.visibility_of_all_elements_located((By.XPATH, self.game_titles)))
         game_elements[random.randrange(len(game_elements) - 1)].click()
 
     def get_current_url(self):
@@ -82,7 +85,6 @@ class LoginPage(BasePage):
     def assert_language_dependence_info(self):
         tree = self.get_request_tree()
         if self.get_max_votes() == 0:
-            print(self.driver.find_element_by_xpath(self.language_dependence_info).text)
             assert self.driver.find_element_by_xpath(self.language_dependence_info).text == "(no votes)"
         else:
             assert self.driver.find_element_by_xpath(self.language_dependence_info).text == tree.findall(
