@@ -10,6 +10,6 @@ class DriverSetup(unittest.TestCase):
         cls.driver.maximize_window()
         cls.driver.get("https://boardgamegeek.com")
 
-    # @classmethod
-    # def tearDownClass(cls):
-    #     cls.driver.quit()
+    @classmethod
+    def tearDownClass(cls):
+        cls.driver.quit()

@@ -74,7 +74,7 @@ class TestLibrary(BasePage):
 
     def get_max_votes(self):
         tree = self.get_request_tree()
-        language_dependency = tree.findall('//poll[@name="language_dependence"]/results/result')
+        language_dependency = tree.findall('.//poll[@name="language_dependence"]/results/result')
         max_votes = 0
         for element in range(len(language_dependency)):
             current_votes = int(language_dependency[element].get('numvotes'))
@@ -88,5 +88,5 @@ class TestLibrary(BasePage):
             assert self.driver.find_element_by_xpath(self.language_dependence_info).text == "(no votes)"
         else:
             assert self.driver.find_element_by_xpath(self.language_dependence_info).text == tree.findall(
-                '//poll[@name="language_dependence"]/results/result[@numvotes="' + str(self.get_max_votes()) + '"]')[0].get(
+                './/poll[@name="language_dependence"]/results/result[@numvotes="' + str(self.get_max_votes()) + '"]')[0].get(
                 'value') == self.driver.find_element_by_xpath(self.language_dependence_info).text
